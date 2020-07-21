@@ -1,1 +1,3 @@
 # Monitor
+setActivityController
+IActivityController.Stub
