@@ -3,6 +3,8 @@ package shitao.li.controler;
 import android.app.IActivityController;
 import android.app.IActivityManager;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
@@ -47,7 +49,6 @@ public class Myservice extends Service {
             Method mGetDefault = cActivityManagerNative.getMethod("getDefault",
                     null);
             Object oActivityManagerNative = mGetDefault.invoke(null, null);
-            Class<?> i = Class.forName("android.app.IActivityController$Stub");
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 Method mSetActivityController = cActivityManagerNative.getMethod(
