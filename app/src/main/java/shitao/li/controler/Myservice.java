@@ -46,9 +46,8 @@ public class Myservice extends Service {
         try {
             Class<?> cActivityManagerNative = Class
                     .forName("android.app.ActivityManagerNative");
-            Method mGetDefault = cActivityManagerNative.getMethod("getDefault",
-                    null);
-            Object oActivityManagerNative = mGetDefault.invoke(null, null);
+            Method mGetDefault = cActivityManagerNative.getMethod("getDefault");
+            Object oActivityManagerNative = mGetDefault.invoke(ActivityManagerNative.getDefault());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
                 Method mSetActivityController = cActivityManagerNative.getMethod(
