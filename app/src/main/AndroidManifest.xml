@@ -4,7 +4,8 @@
     package="shitao.li.controler"
     android:sharedUserId="android.uid.system">
 
-    <uses-permission android:name="android.permission.SET_ACTIVITY_WATCHER"
+    <uses-permission
+        android:name="android.permission.SET_ACTIVITY_WATCHER"
         tools:ignore="ProtectedPermissions" />
 
     <application
@@ -22,7 +23,17 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".Myservice"/>
+        <service android:name=".Myservice" />
+
+        <receiver
+            android:name=".MyReciver"
+            android:exported="true">
+            <intent-filter>
+                <!-- 动作设置为发送的广播动作 -->
+                <action android:name="com.example.broadcast" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

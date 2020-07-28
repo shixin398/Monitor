@@ -26,28 +26,19 @@ import java.io.InputStreamReader;
 public class MyReciver extends BroadcastReceiver {
     private static final String TAG = "MyReciver";
 
+    private static final String ACTIONTAG = "act=";
     private static final String CAST = "com.example.broadcast";
-    private static final String SEARCHTAG = "caller=";
-
-    private int countDown = 10;
-    Handler handler = new Handler();
-
-    static boolean stopFlag = false;
+    private static final String CALLERTAG = "caller=";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "---onReceive: " + intent.getComponent() == null ? "null" : intent.getComponent().getPackageName());
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                String out = exec("dumpsys activity broadcasts");
-                Log.d(TAG, "run: " + out);
-
+                exec("dumpsys activity broadcasts");
             }
         });
         thread.start();
-//        countDown();
-
     }
 
 
@@ -62,78 +53,38 @@ public class MyReciver extends BroadcastReceiver {
         final BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
         //这里一定要注意错误流的读取，不然很容易阻塞，得不到你想要的结果，
         final BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        final Process finalProcess = process;
         new Thread(new Runnable() {
-            String line;
             public void run() {
-                System.out.println("listener started");
-                boolean oldCastFlag = false;
+                String line;
                 boolean castFlag = false;
-                boolean callerFlag = false;
                 String[] info;
                 try {
                     while ((line = inputStream.readLine()) != null) {
-                        castFlag = line.contains(CAST);
-                        callerFlag = line.contains(SEARCHTAG);
-                        if (oldCastFlag && callerFlag){
+                        if (line.contains(ACTIONTAG)) {
+                            castFlag = line.contains(CAST);
+                        }
+                        if (castFlag && line.contains(CALLERTAG)) {
                             line = line.trim();
                             info = line.split(" ");
                             for (String i: info)
                                 Log.d(TAG, "run: " + i);
-                            Log.d(TAG, "run: caller package:" + info[0].substring(7));
-                            System.out.println(line);
+                            Log.d(TAG, "packageName: " + info[0].substring(CALLERTAG.length()));
+                            finalProcess.destroy();
                             break;
                         }
-                        oldCastFlag = castFlag;
-//                        System.out.println(line);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-
-//        new Thread(new Runnable() {
-//            final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//            public void run() {
-//                System.out.println("writer started");
-//                String line;
-//                try {
-//                    while ((line = br.readLine()) != null) {
-//                        outputStream.write(line + "\r\n");
-//                        outputStream.flush();
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-        int i = 0;
         try {
-            i = process.waitFor();
+            process.waitFor();
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
-        System.out.println("i=" + i);
         return null;
-    }
-
-
-    public void countDown() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (countDown >= 0) {
-                    Log.d("lstlog", " time: " + countDown);
-                    handler.postDelayed(this, 1000);
-                    countDown--;
-                } else {
-                    stopFlag = true;
-                    Log.d("lstlog", "finish...");
-//                    finish();
-                }
-
-            }
-        }, 1000);
     }
 
 }

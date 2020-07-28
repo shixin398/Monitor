@@ -1,5 +1,6 @@
 package shitao.li.controler;
 
+import android.app.ActivityManagerNative;
 import android.app.IActivityController;
 import android.app.IActivityManager;
 import android.app.Service;
